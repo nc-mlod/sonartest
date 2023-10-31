@@ -1,0 +1,31 @@
+def sonarQubeAvailable() {
+   def sonarUrl = "http://your-sonarqube-server/api/project_branches/list?project=com.example:test"
+   def sonarAuth = 'sqa_6da74403330d1f2473b01d4738b82cca6219036d' // token uwierzytelniający dla API SonarQube
+
+   withCredentials([string(credentialsId: sonarAuth, variable: 'TOKEN')]) {
+       def response = sh(
+           script: "curl -s -u $TOKEN: -X GET '$sonarUrl'",
+           returnStdout: true
+       ).trim()
+
+       def jsonResponse = readJSON text: response
+       def branchExists = jsonResponse.branches.any { it.name == 'master' && it.status != 'ERROR' }
+
+       return branchExists
+   }
+}
+stage('SonarQube analysis') {
+   steps {
+       script {
+           // Skanuj gałąź docelową, jeśli nie ma dostępnych wyników skanowania
+           if(env.BRANCH_NAME == 'main' || !sonarQubeAvailable()) {
+               sh "sonar-scanner -Dsonar.qualitygate.wait=true"
+           }
+           // W przeciwnym razie skanuj tylko kod w pull requescie
+           sh "sonar-scanner -Dsonar.qualitygate.wait=true \
+           -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \
+           -Dsonar.pullrequest.key=${env.CHANGE_ID} \
+           -Dsonar.pullrequest.base=${env.CHANGE_TARGET}"
+       }
+   }
+}
