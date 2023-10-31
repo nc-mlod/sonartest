@@ -14,18 +14,24 @@ def sonarQubeAvailable() {
        return branchExists
    }
 }
-stage('SonarQube analysis') {
-   steps {
-       script {
-           // Skanuj gałąź docelową, jeśli nie ma dostępnych wyników skanowania
-           if(env.BRANCH_NAME == 'main' || !sonarQubeAvailable()) {
-               sh "sonar-scanner -Dsonar.qualitygate.wait=true"
+pipeline {
+    agent any
+
+    stages {
+        stage('SonarQube analysis') {
+           steps {
+               script {
+                   // Skanuj gałąź docelową, jeśli nie ma dostępnych wyników skanowania
+                   if(env.BRANCH_NAME == 'main' || !sonarQubeAvailable()) {
+                       sh "sonar-scanner -Dsonar.qualitygate.wait=true"
+                   }
+                   // W przeciwnym razie skanuj tylko kod w pull requescie
+                   sh "sonar-scanner -Dsonar.qualitygate.wait=true \
+                   -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \
+                   -Dsonar.pullrequest.key=${env.CHANGE_ID} \
+                   -Dsonar.pullrequest.base=${env.CHANGE_TARGET}"
+               }
            }
-           // W przeciwnym razie skanuj tylko kod w pull requescie
-           sh "sonar-scanner -Dsonar.qualitygate.wait=true \
-           -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \
-           -Dsonar.pullrequest.key=${env.CHANGE_ID} \
-           -Dsonar.pullrequest.base=${env.CHANGE_TARGET}"
-       }
-   }
+        }
+    }
 }
