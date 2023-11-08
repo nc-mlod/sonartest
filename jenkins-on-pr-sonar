@@ -1,12 +1,6 @@
 pipeline {
    agent any
    stages {
-       stage('SCM') {
-           steps {
-               // Pobierz kod z repozytorium (zależnie od systemu kontroli wersji)
-               git 'https://github.com/nc-mlod/sonartest'
-           }
-       }
        stage('SonarQube analysis on base branch') {
            steps {
                // Pobierz nazwę brancha bazowego
