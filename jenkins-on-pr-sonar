@@ -8,7 +8,7 @@ pipeline {
                    def baseBranch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
                    sh "git checkout ${baseBranch}"
                }
-               withSonarQubeEnv('Mój SonarQube Server') {
+               withSonarQubeEnv(installationName: 'sq1') {
                    // tutaj wprowadź swoją komendę do budowania projektu, na przykład 'mvn clean package'
                    sh "mvn clean package sonar:sonar"
                }
