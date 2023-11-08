@@ -18,7 +18,7 @@ pipeline {
            steps {
                // Przełącz na branch PR
                script {
-                   def prBranch = env.BRANCH_NAME
+                   def prBranch = env.CHANGE_BRANCH
                    sh "git checkout ${prBranch}"
                }
                withSonarQubeEnv(installationName: 'sq1') {
