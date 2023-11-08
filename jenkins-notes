@@ -6,7 +6,7 @@ pipeline {
                script {
                    def baseBranch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
                    echo "BASE_BRANCH: ${baseBranch}"
-                   sh "git checkout main"
+                   sh "git checkout ${baseBranch}"
                }
                withSonarQubeEnv(installationName: 'sq1') {
                    sh "mvn clean package sonar:sonar"
@@ -18,7 +18,7 @@ pipeline {
                script {
                    def prBranch = env.CHANGE_BRANCH
                    echo "CHANGE_BRANCH: ${env.CHANGE_BRANCH}"
-                   sh "git checkout fix/controller_text"
+                   sh "git checkout ${prBranch}"
                }
                withSonarQubeEnv(installationName: 'sq1') {
                    sh "mvn clean package sonar:sonar"
