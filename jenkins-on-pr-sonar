@@ -1,0 +1,53 @@
+pipeline {
+   agent any
+   tools {
+       // Wykorzystaj odpowiednią wersję sonarQube
+       sonarQubeEnv 'SonarQube'
+   }
+   stages {
+       stage('SCM') {
+           steps {
+               // Pobierz kod z repozytorium (zależnie od systemu kontroli wersji)
+               git 'https://github.com/nc-mlod/sonartest'
+           }
+       }
+       stage('SonarQube analysis on base branch') {
+           steps {
+               // Pobierz nazwę brancha bazowego
+               script {
+                   def baseBranch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                   sh "git checkout ${baseBranch}"
+               }
+               withSonarQubeEnv('Mój SonarQube Server') {
+                   // tutaj wprowadź swoją komendę do budowania projektu, na przykład 'mvn clean package'
+                   sh "mvn clean package sonar:sonar"
+               }
+           }
+       }
+       stage('SonarQube analysis on PR') {
+           steps {
+               // Przełącz na branch PR
+               script {
+                   def prBranch = env.BRANCH_NAME
+                   sh "git checkout ${prBranch}"
+               }
+               withSonarQubeEnv('Mój SonarQube Server') {
+                   // tutaj wprowadź swoją komendę do budowania projektu, na przykład 'mvn clean package'
+                   sh "mvn clean package sonar:sonar"
+               }
+           }
+       }
+   }
+//   post {
+//       always {
+//           script {
+//               if (currentBuild.result == 'UNSTABLE') {
+//                   currentBuild.result = 'FAILURE'
+//               }
+//           }
+//           // tutaj wprowadź swoje ścieżki do raportów
+//           junit 'ścieżka-do-twoich-raportów/*.xml'
+//           step([$class: 'SonarQubeQualityGateCheck'])
+//       }
+//   }
+}

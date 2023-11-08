@@ -1,6 +1,6 @@
 def sonarQubeAvailable() {
-   def sonarUrl = "http://your-sonarqube-server/api/project_branches/list?project=com.example:test"
-   def sonarAuth = 'sqa_6da74403330d1f2473b01d4738b82cca6219036d' // token uwierzytelniający dla API SonarQube
+   def sonarUrl = "http://172.17.0.1:9000/api/project_branches/list?project=com.example:test"
+   def sonarAuth = 'jenkins-sonar' // token uwierzytelniający dla API SonarQube
 
    withCredentials([string(credentialsId: sonarAuth, variable: 'TOKEN')]) {
        def response = sh(
@@ -9,23 +9,29 @@ def sonarQubeAvailable() {
        ).trim()
 
        def jsonResponse = readJSON text: response
-       def branchExists = jsonResponse.branches.any { it.name == 'master' && it.status != 'ERROR' }
+       def branchExists = jsonResponse.branches.any { it.name == 'main' && it.status != 'ERROR' }
 
        return branchExists
    }
 }
-stage('SonarQube analysis') {
-   steps {
-       script {
-           // Skanuj gałąź docelową, jeśli nie ma dostępnych wyników skanowania
-           if(env.BRANCH_NAME == 'main' || !sonarQubeAvailable()) {
-               sh "sonar-scanner -Dsonar.qualitygate.wait=true"
+pipeline {
+    agent any
+
+    stages {
+        stage('SonarQube analysis') {
+           steps {
+               script {
+                   // Skanuj gałąź docelową, jeśli nie ma dostępnych wyników skanowania
+                   if(env.BRANCH_NAME == 'main' || !sonarQubeAvailable()) {
+                       sh "sonar-scanner -Dsonar.qualitygate.wait=true"
+                   }
+                   // W przeciwnym razie skanuj tylko kod w pull requescie
+                   sh "sonar-scanner -Dsonar.qualitygate.wait=true \
+                   -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \
+                   -Dsonar.pullrequest.key=${env.CHANGE_ID} \
+                   -Dsonar.pullrequest.base=${env.CHANGE_TARGET}"
+               }
            }
-           // W przeciwnym razie skanuj tylko kod w pull requescie
-           sh "sonar-scanner -Dsonar.qualitygate.wait=true \
-           -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \
-           -Dsonar.pullrequest.key=${env.CHANGE_ID} \
-           -Dsonar.pullrequest.base=${env.CHANGE_TARGET}"
-       }
-   }
+        }
+    }
 }
