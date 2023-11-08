@@ -19,4 +19,9 @@ public class HelloWorldController {
     public ResponseEntity<String> getHelloHouse(){
         return ResponseEntity.status(HttpStatus.OK).body("Hello House to my controller");
     }
+
+    @GetMapping(value = "/business")
+    public ResponseEntity<String> getBusiness(){
+        return ResponseEntity.status(HttpStatus.OK).body("Deprecha");
+    }
 }
