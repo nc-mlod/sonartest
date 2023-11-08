@@ -3,27 +3,24 @@ pipeline {
    stages {
        stage('SonarQube analysis on base branch') {
            steps {
-               // Pobierz nazwę brancha bazowego
                script {
                    def baseBranch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                   echo "BASE_BRANCH: ${baseBranch}"
                    sh "git checkout ${baseBranch}"
                }
                withSonarQubeEnv(installationName: 'sq1') {
-                   // tutaj wprowadź swoją komendę do budowania projektu, na przykład 'mvn clean package'
                    sh "mvn clean package sonar:sonar"
                }
            }
        }
        stage('SonarQube analysis on PR') {
            steps {
-               // Przełącz na branch PR
                script {
                    def prBranch = env.CHANGE_BRANCH
                    echo "CHANGE_BRANCH: ${env.CHANGE_BRANCH}"
                    sh "git checkout ${prBranch}"
                }
                withSonarQubeEnv(installationName: 'sq1') {
-                   // tutaj wprowadź swoją komendę do budowania projektu, na przykład 'mvn clean package'
                    sh "mvn clean package sonar:sonar"
                }
            }
