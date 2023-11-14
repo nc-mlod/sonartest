@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build and Test') {
+            steps {
+                // Pobierz zależności, skompiluj, wykonaj testy i wygeneruj pliki .exec JaCoCo
+                sh 'mvn clean verify'
+            }
+        }
+
+        stage('JaCoCo') {
+            steps {
+                // Utwórz raport JaCoCo
+                jacoco(execPattern: '**/target/jacoco.exec')
+            }
+        }
+    }
+}
