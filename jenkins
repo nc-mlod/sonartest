@@ -1,6 +1,6 @@
 def sonarQubeAvailable() {
    def sonarUrl = "http://172.17.0.1:9000/api/project_branches/list?project=com.example:test"
-   def sonarAuth = 'jenkins-sonar' // token uwierzytelniający dla API SonarQube
+   def sonarAuth = 'jenkins-sonar'
 
    withCredentials([string(credentialsId: sonarAuth, variable: 'TOKEN')]) {
        def response = sh(
@@ -21,11 +21,11 @@ pipeline {
         stage('SonarQube analysis') {
            steps {
                script {
-                   // Skanuj gałąź docelową, jeśli nie ma dostępnych wyników skanowania
+
                    if(env.BRANCH_NAME == 'main' || !sonarQubeAvailable()) {
                        sh "sonar-scanner -Dsonar.qualitygate.wait=true"
                    }
-                   // W przeciwnym razie skanuj tylko kod w pull requescie
+
                    sh "sonar-scanner -Dsonar.qualitygate.wait=true \
                    -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \
                    -Dsonar.pullrequest.key=${env.CHANGE_ID} \
