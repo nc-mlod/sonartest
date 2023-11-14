@@ -63,8 +63,8 @@
 				<version>0.8.5</version>
 				<configuration>
 					<excludes>
-						<exlude>**/controller/**/*.class</exlude>
-						<exlude>**/com/**/*.class</exlude>
+						<exclude>**/controller/**/*.class</exclude>
+						<exclude>**/com/**/*.class</exclude>
 					</excludes>
 				</configuration>
 				<executions>
