@@ -61,6 +61,12 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.5</version>
+				<configuration>
+					<excludes>
+						<exlude>**/src/main/java/controller/**/*.java</exlude>
+						<exlude>**/com/**/*.java</exlude>
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<id>before-unit-test-execution</id>
