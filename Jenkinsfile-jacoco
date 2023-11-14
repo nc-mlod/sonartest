@@ -12,7 +12,8 @@ pipeline {
         stage('JaCoCo') {
             steps {
                 // Utwórz raport JaCoCo
-                jacoco(execPattern: '**/target/jacoco.exec')
+                jacoco(execPattern: '**/target/jacoco.exec',
+                        exclusionPattern: '**/controller/**,**/com/**')
             }
         }
     }
