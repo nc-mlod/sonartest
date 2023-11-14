@@ -63,7 +63,7 @@
 				<version>0.8.5</version>
 				<configuration>
 					<excludes>
-						<exlude>**/src/main/java/controller/**/*.class</exlude>
+						<exlude>**/controller/**/*.class</exlude>
 						<exlude>**/com/**/*.class</exlude>
 					</excludes>
 				</configuration>
