@@ -12,6 +12,7 @@ pipeline {
     post {
         always {
             script {
+                jacoco('target/jacoco.exec')
                 archiveArtifacts artifacts: 'target/site/jacoco/**', allowEmptyArchive: true
             }
         }
