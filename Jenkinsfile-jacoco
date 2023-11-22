@@ -12,7 +12,7 @@ pipeline {
     post {
         always {
             script {
-                archiveArtifacts artifacts: 'target/site/jacoco/*', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'target/site/jacoco/**', allowEmptyArchive: true
             }
         }
     }
