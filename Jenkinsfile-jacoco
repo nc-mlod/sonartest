@@ -8,12 +8,11 @@ pipeline {
                 sh 'mvn clean jacoco:prepare-agent install jacoco:report'
             }
         }
-
-        stage('JaCoCo') {
-            steps {
-                // Utwórz raport JaCoCo
-                jacoco(execPattern: '**/target/jacoco.exec',
-                        exclusionPattern: '**/controller/**,**/com/**')
+    }
+    post {
+        always {
+            script {
+                archiveArtifacts artifacts: 'test/target/site/jacoco/index.html', allowEmptyArchive: true
             }
         }
     }
